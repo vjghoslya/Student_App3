@@ -30,6 +30,7 @@ pipeline {
         stage('Run Tests..... ') {
             steps {
                 sh '''
+		    . $VENV_DIR/bin/activate
                     pytest test_app.py
                 '''
             }
