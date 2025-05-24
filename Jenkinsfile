@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git branch: 'https://github.com/vjghoslya/Student_App3.git'
+                git url: 'https://github.com/vjghoslya/Student_App3.git'
             }
         }
 
