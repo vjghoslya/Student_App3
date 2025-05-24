@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    environment {
+        VENV_DIR = 'venv'
+        DOCKER_IMAGE = 'studentapp-image:latest'
+        DOCKER_CONTAINER = 'studentapp-container'
+        STAGING_SERVER = '192.168.188.142'
+        REMOTE_USER = 'ubuntu'
+    }
+
     stages {
         stage('Clone Repo') {
             steps {
@@ -8,24 +16,54 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Dependencies in Virtualenv') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh '''
+                    sudo apt-get update
+                    sudo apt-get install -y python3-venv python3-pip
+                    python3 -m venv $VENV_DIR
+                    source $VENV_DIR/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest test_app.py --maxfail=1 --disable-warnings -q'
+                sh '''
+                    //source $VENV_DIR/bin/activate
+                    pytest test_app.py
+                '''
             }
         }
 
-        stage('Run Flask App') {
+        stage('Dockerize Application') {
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
             steps {
-                sh 'docker run -d 5000:5000 python:3.10 nohup python app.py &'
+                sh "docker build -t $DOCKER_IMAGE ."
+            }
+        }
+
+        stage('Deploy to Staging Server $STAGING_SERVER') {
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
+            steps {
+                sh '''
+                    docker save $DOCKER_IMAGE | bzip2 | ssh -o StrictHostKeyChecking=no $REMOTE_USER@$STAGING_SERVER 'bunzip2 | docker load'
+                    ssh $REMOTE_USER@$STAGING_SERVER '
+                        docker stop $DOCKER_CONTAINER || true &&
+                        docker rm $DOCKER_CONTAINER || true &&
+                        docker run -d --name $DOCKER_CONTAINER -p 8000:8000 yourapp-image:latest
+                    '
+                '''
             }
         }
     }
+
     post {
         success {
             mail to: 'you@example.com',
