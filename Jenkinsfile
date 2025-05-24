@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/mohanDevOps-arch/Student_App.git'
+                git 'https://github.com/vjghoslya/Student_App3.git'
             }
         }
 
@@ -22,9 +22,20 @@ pipeline {
 
         stage('Run Flask App') {
             steps {
-                sh 'docker run -d 5000:5000 python:3.10 nohup python app.py &
-'
+                sh 'docker run -d 5000:5000 python:3.10 nohup python app.py &'
             }
+        }
+    }
+    post {
+        success {
+            mail to: 'you@example.com',
+                 subject: "Build Successful: ${env.JOB_NAME}",
+                 body: "The build was successful!"
+        }
+        failure {
+            mail to: 'you@example.com',
+                 subject: "Build Failed: ${env.JOB_NAME}",
+                 body: "The build has failed. Check Jenkins for details."
         }
     }
 }
