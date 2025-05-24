@@ -19,8 +19,8 @@ pipeline {
         stage('Install Dependencies in Virtualenv') {
             steps {
                 sh '''
-                    sudo apt-get update
-                    sudo apt-get install -y python3-venv python3-pip
+                    apt-get update
+                    apt-get install -y python3-venv python3-pip
                     python3 -m venv $VENV_DIR
                     source $VENV_DIR/bin/activate
                     pip install --upgrade pip
