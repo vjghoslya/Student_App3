@@ -38,7 +38,7 @@ pipeline {
             }
         }
 
-        stage('Dockerize Application') {
+        stage('Dockerize Application ..') {
             when {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
