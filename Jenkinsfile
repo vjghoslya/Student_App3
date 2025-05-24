@@ -29,7 +29,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests dev...') {
+        stage('Run Tests ') {
             steps {
                 sh '''
                     //source $VENV_DIR/bin/activate
