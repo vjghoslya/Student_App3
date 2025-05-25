@@ -51,11 +51,12 @@ pipeline {
             }
             steps {
                 sh '''
-                    docker save $DOCKER_IMAGE | bzip2 | ssh -o StrictHostKeyChecking=no $REMOTE_USER@$STAGING_SERVER 'bunzip2 | docker load'
+                    docker save $DOCKER_IMAGE | bzip2 > $DOCKER_IMAGE.tar.bz2
+		    scp $DOCKER_IMAGE.tar.bz2 $REMOTE_USER@$STAGING_SERVER:/tmp/ 
                     ssh $REMOTE_USER@$STAGING_SERVER '
                         docker stop $DOCKER_CONTAINER || true &&
                         docker rm $DOCKER_CONTAINER || true &&
-                        docker run -d --name $DOCKER_CONTAINER -p 8000:8000 yourapp-image:latest
+                        docker run -d --name $DOCKER_CONTAINER -p 5000:5000 yourapp-image:latest
                     '
                 '''
             }
