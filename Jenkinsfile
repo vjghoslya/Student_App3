@@ -65,7 +65,7 @@ pipeline {
     post {
         success {
             mail to: 'you@example.com',
-                 subject: "Build Successful: ${env.JOB_NAME}",
+                 subject: "Build Successful : ${env.JOB_NAME}",
                  body: "The build was successful!"
         }
         failure {
