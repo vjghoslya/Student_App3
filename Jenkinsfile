@@ -42,6 +42,8 @@ pipeline {
             }
             steps {
                 sh "docker build -t $DOCKER_IMAGE ."
+		sh "docker tag studentapp-image vjghoslya/studentapp-image:latest"
+		sh "docker push vjghoslya/studentapp-image:latest"
             }
         }
 
@@ -52,12 +54,12 @@ pipeline {
             steps {
                 sshagent (credentials: ['student-node']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no $REMOTE_USER@$STAGING_SERVER '
+                        ssh -o StrictHostKeyChecking=no $REMOTE_USER@$STAGING_SERVER << EOF
                             docker pull $DOCKER_IMAGE &&
                             docker stop $DOCKER_CONTAINER || true &&
                             docker rm $DOCKER_CONTAINER || true &&
                             docker run -d --name $DOCKER_CONTAINER -p 5000:5000 $DOCKER_IMAGE
-                        '
+                        EOF
                     """
                 }
             }
