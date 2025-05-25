@@ -50,15 +50,16 @@ pipeline {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-                sh '''
-                    docker save $DOCKER_IMAGE | bzip2 > $DOCKER_IMAGE.tar.bz2
-		    scp $DOCKER_IMAGE.tar.bz2 $REMOTE_USER@$STAGING_SERVER:/tmp/ 
-                    ssh $REMOTE_USER@$STAGING_SERVER '
-                        docker stop $DOCKER_CONTAINER || true &&
-                        docker rm $DOCKER_CONTAINER || true &&
-                        docker run -d --name $DOCKER_CONTAINER -p 5000:5000 yourapp-image:latest
-                    '
-                '''
+		sshagent (credentials: ['your-credential-id']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no $REMOTE_USER@$STAGING_SERVER '
+		      	     docker pull $IMAGE_NAME &&
+                             docker stop $DOCKER_CONTAINER || true &&
+                             docker rm $DOCKER_CONTAINER || true &&
+                             docker run -d --name $DOCKER_CONTAINER -p 5000:5000 yourapp-image:latest
+                        '
+                    '''
+                }
             }
         }
     }
