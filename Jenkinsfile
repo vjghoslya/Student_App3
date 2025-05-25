@@ -6,7 +6,7 @@ pipeline {
         DOCKER_IMAGE = 'studentapp-image:latest'
         DOCKER_CONTAINER = 'studentapp-container'
         STAGING_SERVER = '192.168.188.142'
-        REMOTE_USER = 'ubuntu'
+        REMOTE_USER = 'student'
     }
 
     stages {
