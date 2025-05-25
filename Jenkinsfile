@@ -50,7 +50,7 @@ pipeline {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-		sshagent (credentials: ['your-credential-id']) {
+		sshagent (credentials: ['student-node']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no $REMOTE_USER@$STAGING_SERVER '
 		      	     docker pull $IMAGE_NAME &&
