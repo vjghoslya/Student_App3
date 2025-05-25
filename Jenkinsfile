@@ -27,16 +27,16 @@ pipeline {
             }
         }
 
-        stage('Run Tests  ..... ') {
+        stage('Run Tests') {
             steps {
                 sh '''
-		    . $VENV_DIR/bin/activate
+                    . $VENV_DIR/bin/activate
                     pytest test_app.py
                 '''
             }
         }
 
-        stage('Dockerize Application .....') {
+        stage('Dockerize Application') {
             when {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
@@ -45,20 +45,20 @@ pipeline {
             }
         }
 
-        stage('Deploy to Staging Server $STAGING_SERVER .,,,') {
+        stage('Deploy to Staging Server') {
             when {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-		sshagent (credentials: ['student-node']) {
-                    sh '''
+                sshagent (credentials: ['student-node']) {
+                    sh """
                         ssh -o StrictHostKeyChecking=no $REMOTE_USER@$STAGING_SERVER '
-		      	     docker pull $IMAGE_NAME &&
-                             docker stop $DOCKER_CONTAINER || true &&
-                             docker rm $DOCKER_CONTAINER || true &&
-                             docker run -d --name $DOCKER_CONTAINER -p 5000:5000 yourapp-image:latest
+                            docker pull $DOCKER_IMAGE &&
+                            docker stop $DOCKER_CONTAINER || true &&
+                            docker rm $DOCKER_CONTAINER || true &&
+                            docker run -d --name $DOCKER_CONTAINER -p 5000:5000 $DOCKER_IMAGE
                         '
-                    '''
+                    """
                 }
             }
         }
@@ -67,13 +67,13 @@ pipeline {
     post {
         success {
             mail to: 'vijay.rhce@gmail.com',
-                 subject: "Build Successful : ${env.JOB_NAME}",
+                 subject: "Build Successful: ${env.JOB_NAME}",
                  body: "The build was successful!"
         }
         failure {
             mail to: 'vijay.rhce@gmail.com',
                  subject: "Build Failed: ${env.JOB_NAME}",
-                 body: "The build has failed. Check Jenkins for details.."
+                 body: "The build has failed. Check Jenkins for details."
         }
     }
 }
