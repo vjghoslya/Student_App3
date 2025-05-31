@@ -47,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Staging Server....') {
+        stage('Deploy to Staging Server.....') {
             when {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
