@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/vjghoslya/Student_App3.git'
+                git branch: 'main', url: 'https://github.com/vjghoslya/studentapp3.git'
             }
         }
 
@@ -47,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Staging Server') {
+        stage('Deploy to Staging Server....') {
             when {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
