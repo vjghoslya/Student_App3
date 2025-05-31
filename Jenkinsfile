@@ -41,13 +41,18 @@ pipeline {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-                sh "docker build -t $DOCKER_IMAGE ."
-		sh "docker tag studentapp-image vjghoslya/studentapp-image:latest"
-		sh "docker push vjghoslya/studentapp-image:latest"
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                    sh '''
+                        docker build -t studentapp-image:latest .
+                        docker tag studentapp-image:latest vjghoslya/studentapp-image:latest
+                        echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                        docker push vjghoslya/studentapp-image:latest
+                    '''
+                }
             }
         }
 
-        stage('Deploy to Staging Server.....') {
+        stage('Deploy to Staging Server') {
             when {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
