@@ -66,6 +66,26 @@ pipeline {
                 }
             }
         }
+        stage('SSH and run multiple commands') {
+            steps {
+                script {
+                    sshagent (credentials: ['student-node']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${env.$REMOTE_USER}@${env.$STAGING_SERVER} << EOF
+                                echo "Connected to \$(hostname)"
+                                pwd
+                                ls -l /var/log
+                                uptime
+                                docker pull $DOCKER_IMAGE &&
+                                docker stop $DOCKER_CONTAINER || true &&
+                                docker rm $DOCKER_CONTAINER || true &&
+                                docker run -d --name $DOCKER_CONTAINER -p 5000:5000 $DOCKER_IMAGE
+                            EOF
+                        """
+                    }
+                }
+            }
+        }
     }
 
     post {
