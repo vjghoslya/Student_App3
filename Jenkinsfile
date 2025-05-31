@@ -53,9 +53,6 @@ pipeline {
         }
 
         stage('Deploy to Staging Server') {
-            when {
-                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
-            }
             steps {
                 sshagent (credentials: ['student-node']) {
                     sh """
