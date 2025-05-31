@@ -43,6 +43,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
                     sh '''
+                        docker login -u vjghoslya
                         docker build -t studentapp-image:latest .
                         docker tag studentapp-image:latest vjghoslya/studentapp-image:latest
                         echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
