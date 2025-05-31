@@ -52,20 +52,6 @@ pipeline {
             }
         }
 
-        stage('Deploy to Staging Server') {
-            steps {
-                sshagent (credentials: ['student-node']) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no $REMOTE_USER@$STAGING_SERVER << EOF
-                            docker pull $DOCKER_IMAGE &&
-                            docker stop $DOCKER_CONTAINER || true &&
-                            docker rm $DOCKER_CONTAINER || true &&
-                            docker run -d --name $DOCKER_CONTAINER -p 5000:5000 $DOCKER_IMAGE
-                        EOF
-                    """
-                }
-            }
-        }
         stage('SSH and run multiple commands') {
             steps {
                 script {
